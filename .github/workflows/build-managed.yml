@@ -1,0 +1,127 @@
+name: build-managed
+
+# Builds the managed (.NET Framework 4.8) half of SharpEnviro.
+#
+# The native/Delphi half (SharpCore, SharpBar, SharpDesk, plugins) cannot be built
+# here: it needs a Delphi 2007-era compiler and the rtl100/vcl100 runtime packages,
+# which are not freely obtainable. Only the C# components are built.
+#
+# The x86 project list deliberately mirrors the installer's tree, which nests the
+# native Explorer.dll and the C# desktop host in Addons\86 (x86) vs Addons\x64\
+# (x64). The native Addons\x86\Explorer.exe remains 2011 stock.
+
+on:
+  push:
+    branches: [win11-compat, win11-vmtest, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
+
+jobs:
+  managed:
+    name: managed (${{ matrix.platform }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x64, x86]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $platform = '${{ matrix.platform }}'
+
+          # Libraries + desktop host ship in Addons\<arch>\.
+          $addonProjects = @(
+            'Common/Libraries/SharpEnviro/SharpEnviro.csproj',
+            'Common/Libraries/SharpSearch/SharpSearch.csproj',
+            'Common/Libraries/SharpSearch.WPF/SharpSearch.WPF.csproj',
+            'Components/ExplorerNET/Explorer.csproj'
+          )
+          # Executables that live beside Addons\ at the install root.
+          $rootProjects = @(
+            'Components/SharpLinkLauncherNET/SharpLinkLauncherNET.csproj'
+          )
+          # x86: the installer's x86 tree hosts only the libraries and the desktop
+          # host; the native Addons\x86\Explorer.exe stays as shipped in 2011.
+          if ($platform -eq 'x86') {
+            $rootProjects = @()
+          }
+
+          foreach ($p in ($addonProjects + $rootProjects)) {
+            Write-Host "=== $p ($platform) ==="
+            dotnet build $p -c Release -p:Platform=$platform -v minimal
+            if ($LASTEXITCODE -ne 0) { throw "build failed: $p" }
+          }
+
+      - name: Show output tree
+        shell: pwsh
+        run: |
+          # OutputPath is ..\..\..\SharpE\..., i.e. a sibling of the checkout.
+          $out = Join-Path (Split-Path -Parent '${{ github.workspace }}') 'SharpE'
+          Write-Host "output root: $out"
+          if (-not (Test-Path $out)) { throw "no output tree at $out" }
+          Get-ChildItem $out -Recurse -File |
+            ForEach-Object { '{0,12:N0}  {1}' -f $_.Length, $_.FullName.Substring($out.Length + 1) }
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $platform = '${{ matrix.platform }}'
+          $repoRoot = '${{ github.workspace }}'
+          $out      = Join-Path (Split-Path -Parent $repoRoot) 'SharpE'
+          $stage    = Join-Path $repoRoot "stage\$platform"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+
+          # Addons payload: everything the build wrote under Addons\<arch>\
+          $addons = Join-Path $out "Addons\$platform"
+          if (Test-Path $addons) {
+            Copy-Item (Join-Path $addons '*') $stage -Recurse -Force
+          }
+
+          foreach ($n in 'SharpLinkLauncherNET.exe', 'SharpSearchNET.exe', 'SharpShellServicesNET.exe') {
+            $f = Join-Path $out $n
+            if (Test-Path $f) { Copy-Item $f $stage -Force }
+          }
+
+          $files = @(Get-ChildItem $stage -Recurse -File)
+          if ($files.Count -eq 0) { throw "nothing to package at $stage" }
+
+          # Fail loudly rather than publish a package missing the interop the
+          # .NET 4.8 System.Data.SQLite build probes for (x64\ / x86\).
+          if ($platform -eq 'x64') {
+            foreach ($req in 'x64\SQLite.Interop.dll', 'System.Data.SQLite.dll', 'Explorer.exe') {
+              if (-not (Test-Path (Join-Path $stage $req))) {
+                throw "package incomplete: $req missing - see TESTPLAN phase 1b assertions"
+              }
+            }
+          }
+
+          $files | ForEach-Object { '{0,12:N0}  {1}' -f $_.Length, $_.FullName.Substring($stage.Length + 1) }
+
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Compress-Archive -Path (Join-Path $stage '*') `
+            -DestinationPath "dist\SharpEnviro-win11-managed-$platform.zip" -Force
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: SharpEnviro-win11-managed-${{ matrix.platform }}
+          path: dist/*.zip
+          if-no-files-found: error
