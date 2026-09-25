@@ -146,7 +146,50 @@ next logon should come up as a plain Windows 11 desktop.
 
 ## Next steps
 
-1. **Snapshot as `phase-0-baseline`** — still the outstanding prerequisite; the
-   black-screen risk of phase 4 has no rollback without it.
+1. **Snapshot as `phase-0-baseline`** — the desktop is verified clean (below), so
+   now is the moment. The black-screen risk of phase 4 has no rollback without it.
 2. Phase 4: `<install>\SetShell.exe`, reboot.
 3. Phases 5–7 (architectural checks, rebuilt managed components, .NET 3.5 gate).
+
+## Phase 0 baseline — CONFIRMED clean (2026-09-25 16:25, after reboot)
+
+Verified from **inside session 1** (`Evidence/session1-shell.txt`):
+
+```
+GetShellWindow() = 0x10110   class = Progman   "Program Manager"
+Shell_TrayWnd    visible=True        WorkerW  visible=False
+verdict: EXPLORER is the shell - clean Windows 11 desktop (phase 0 baseline)
+```
+
+- no SharpE processes or windows; no autostart entry that would relaunch it
+- shell registration stock in **both** registry views (`SYS:` / `explorer.exe`),
+  `amitb`'s `HKCU Shell` absent
+- the manifest patch **survived the reboot** (10 EXEs carry `supportedOS`)
+- back-ups intact: `C:\SharpEnviro-backup-20260925-161425`, `_manifest-backup\`
+
+### Methodology gotcha: `GetShellWindow()` is per-session
+
+**Do not trust `GetShellWindow()` collected over WinRM.** WinRM runs in
+**session 0** (services); the interactive desktop is **session 1**. The call is
+per-session and returns **NULL from session 0 every time** — it says nothing about
+whether a shell exists. This produced a false "no shell" reading until the check
+was run in-session.
+
+```powershell
+qwinsta            # console = session 1 (amitb, Active); WinRM caller = session 0
+```
+
+To check the shell remotely, run a check **in the interactive session** via an
+`Interactive`-logon scheduled task — `Evidence/session1-shell-check.ps1` +
+the runner used here:
+
+```powershell
+$action    = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-File <share>\session1-shell-check.ps1"
+$principal = New-ScheduledTaskPrincipal -UserId 'SHARPENVIRO\amitb' -LogonType Interactive -RunLevel Highest
+Register-ScheduledTask -TaskName 'SharpE-Session1Check' -Action $action -Principal $principal -Force
+Start-ScheduledTask -TaskName 'SharpE-Session1Check'
+```
+
+`collect-evidence.ps1` is fine when run **interactively in the VM** (as the plan
+says); its `GetShellWindow()` line is only misleading when the script is driven
+over WinRM.
