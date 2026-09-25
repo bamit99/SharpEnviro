@@ -120,29 +120,31 @@ function TScHotkeyManager.CheckHotkeyExists(Key: string;
   Modifier: TScModifier): boolean;
 var
   i: integer;
-  b: boolean;
   uid: integer;
 begin
+  result := false;
+
   // 1st check list
-  b := false;
-  for i := 0 to Self.Count - 1 do begin
+  for i := 0 to Self.Count - 1 do
     if (Info[i].FKey = Key) and (Info[i].FModifiers = Modifier) then begin
-      b := true;
-      break;
+      result := true;
+      exit;
     end;
 
-    // now check for system registration
-    if b = true then begin
-      uid := GetUniqueID('hotkeycheck');
-      if RegisterHotKey(FWMHandle, uId, GetModifierInt(modifier), GetKey(Key)) then
-        b := true
-      else
-        b := false;
-      UnregisterHotKey(FWMHandle, uId);
-    end;
+  // now check for system registration: register the combination with an atom based id,
+  // if that fails it is already owned by Windows or by another application
+  uid := GlobalAddAtom('hotkeycheck');
+  if uid <> 0 then
+  try
+    if RegisterHotKey(FWMHandle, uid, GetModifierInt(modifier), GetKey(Key)) then
+      // we own it now, so release it again
+      UnregisterHotKey(FWMHandle, uid)
+    else
+      result := true;
+  finally
+    // always release the atom, whatever happened above
+    GlobalDeleteAtom(uid);
   end;
-
-  result := b;
 end;
 
 constructor TScHotkeyManager.Create;
@@ -234,8 +236,27 @@ begin
 end;
 
 procedure TScHotkeyManager.RegisterKey(Index: integer);
+var
+  lModifier: Integer;
 begin
-  RegisterHotKey(FWMHandle, info[index].HotkeyUId, GetModifierInt(index), GetKey(index));
+  lModifier := GetModifierInt(index);
+
+  if not RegisterHotKey(FWMHandle, info[index].HotkeyUId, lModifier, GetKey(index)) then begin
+
+    // Windows (Windows 11 in particular) reserves several WIN key combinations
+    // (Win+D/E/M/R/N, ...), so retry once without the WIN modifier
+    if (lModifier and MOD_WIN) <> 0 then begin
+      lModifier := lModifier and not MOD_WIN;
+
+      if RegisterHotKey(FWMHandle, info[index].HotkeyUId, lModifier, GetKey(index)) then begin
+        Debug(Format('Hotkey %s: WIN modifier is reserved by Windows, registered without it',[Info[Index].Command]),DMT_WARN);
+        exit;
+      end;
+    end;
+
+    // still failing, report it once for this entry
+    Debug(Format('Error Registering Hotkey %s: Error Code %d',[Info[Index].Command,GetLastError]),DMT_ERROR);
+  end;
 end;
 
 procedure TScHotkeyManager.UnRegisterKey(Index: integer);

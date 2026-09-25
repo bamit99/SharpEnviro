@@ -26,15 +26,18 @@ unit uDWMFuncs;
 interface
 
 uses Windows,
+      ActiveX,  // S_OK (DwmGetWindowAttribute success code)
       SharpApi;
 
 const
   DWMWA_EXTENDED_FRAME_BOUND = 9;
   DWMWA_DISALLOW_PEEK = 12;
+  DWMWA_CLOAKED = 14;
 
 function DwmIsCompositionEnabled(var Enabled: Boolean): HRESULT;
 function DwmGetWindowAttribute(hwnd: HWND; dwAttribute: DWORD; pvAttribute: Pointer; cbAttribute: DWORD): HRESULT;
 function DwmSetWindowAttribute(hwnd: HWND; dwAttribute: DWORD; pvAttribute: Pointer; cbAttribute: DWORD): HRESULT;
+function IsWindowCloaked(wnd: HWND): Boolean;
 
 // Peek
 procedure DwmPeekDesktop;
@@ -77,6 +80,23 @@ begin
   
   if Assigned(FDwmSetWindowAttribute) then
     Result := FDwmSetWindowAttribute(hwnd, dwAttribute, pvAttribute, cbAttribute);
+end;
+
+// Returns True only when DWM reports the window as cloaked. Fails open: when
+// dwmapi.dll is unavailable, or the function/call fails, the window is treated
+// as not cloaked so behaviour is unchanged on systems without DWM support.
+function IsWindowCloaked(wnd: HWND): Boolean;
+var
+  Cloaked: Cardinal;
+begin
+  Result := False;
+
+  if Assigned(FDwmGetWindowAttribute) then
+  begin
+    Cloaked := 0;
+    if DwmGetWindowAttribute(wnd, DWMWA_CLOAKED, @Cloaked, SizeOf(Cloaked)) = S_OK then
+      Result := Cloaked <> 0;
+  end;
 end;
 
 procedure DwmPeekDesktop;

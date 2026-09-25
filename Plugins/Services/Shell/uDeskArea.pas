@@ -239,7 +239,9 @@ begin
             end;
         end;
 
-      if ((Win32MajorVersion = 5) and (Win32MinorVersion >= 1)) or (Win32MajorVersion = 6) then
+      // Vista or later. An EXE manifest declaring supportedOS for Windows 10/11
+      // makes Win32MajorVersion 10, so only the major version may be tested here.
+      if Win32MajorVersion >= 6 then
       begin
         if not uxTheme.IsThemeActive then
         begin

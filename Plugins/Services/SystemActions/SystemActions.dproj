@@ -50,6 +50,7 @@ if $(Configuration)==Debug del "$(OUTPUTDIR)$(OUTPUTNAME).map"</PostBuildEvent>
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <DCCReference Include="..\..\..\Common\Units\DebugDialog\DebugDialog.pas" />
+    <DCCReference Include="..\..\..\Common\Units\DWMApi\uDWMFuncs.pas" />
     <DCCReference Include="..\..\..\Common\Units\Shutdown\uShutdown.pas" />
     <DCCReference Include="..\..\..\Common\Units\Shutdown\uShutdownConfirm.pas" />
     <DCCReference Include="..\..\..\Components\SharpBar\uSharpBar.pas" />

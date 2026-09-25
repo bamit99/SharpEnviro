@@ -231,7 +231,11 @@ type
   TinvFile = file of Tinv;
 
 const
-  ABM_SETSTATE = 10; 
+  ABM_SETSTATE = 10;
+
+  // per-monitor autohide appbar variants (handled edge-only by TTrayManager.HandleAppBarMessage)
+  ABM_GETAUTOHIDEBAREX = $0B;
+  ABM_SETAUTOHIDEBAREX = $0C;
 
   SH_APPBAR_DATA     = 0;
   SH_TRAY_DATA       = 1;

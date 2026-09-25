@@ -54,6 +54,7 @@ if $(Configuration)==Debug del "$(OUTPUTDIR)$(OUTPUTNAME).map"</PostBuildEvent>
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <DCCReference Include="..\..\..\Common\Units\DebugDialog\DebugDialog.pas" />
+    <DCCReference Include="..\..\..\Common\Units\DWMApi\uDWMFuncs.pas" />
     <DCCReference Include="..\..\..\Common\Units\TaskFilterList\SWCmdList.pas" />
     <DCCReference Include="..\..\..\Common\Units\TaskFilterList\TaskFilterList.pas" />
     <DCCReference Include="..\Shell\uDeskArea.pas" />

@@ -50,6 +50,7 @@ uses
   uTaskItem in 'uTaskItem.pas',
   VWMFunctions in '..\..\..\Common\Units\VWM\VWMFunctions.pas',
   uSystemFuncs in '..\..\..\Common\Units\SystemFuncs\uSystemFuncs.pas',
+  uDWMFuncs in '..\..\..\Common\Units\DWMApi\uDWMFuncs.pas',
   uExplorer in 'uExplorer.pas',
   uWindows in 'uWindows.pas',
   uDeskArea in 'uDeskArea.pas',

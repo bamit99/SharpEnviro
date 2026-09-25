@@ -498,7 +498,7 @@ begin
           link.Target := text;
           forceshelllinkopen := true;
         end;
-        if (uSystemFuncs.NETFramework35)
+        if (uSystemFuncs.IsDotNetFrameworkInstalled)
           and (SysUtils.FileExists(GetSharpeDirectory + 'SharpLinkLauncherNET.exe'))
           and (not forceshelllinkopen) then
         begin
@@ -520,7 +520,7 @@ begin
 
       CoUninitialize;
       if Failed then
-        if (uSystemFuncs.NETFramework35) //and IsWow64()
+        if (uSystemFuncs.IsDotNetFrameworkInstalled) //and IsWow64()
           and (SysUtils.FileExists(GetSharpeDirectory + 'SharpLinkLauncherNET.exe')) then
         begin
           result := NETLinkLaunch(textstripped, Elevate);
@@ -683,7 +683,7 @@ begin
     end;
 
     // Use net launcher as a last resort
-    if ((uSystemFuncs.NETFramework35)
+    if ((uSystemFuncs.IsDotNetFrameworkInstalled)
         and (SysUtils.FileExists(GetSharpeDirectory + 'SharpLinkLauncherNET.exe'))) then
     begin
       Result := NETLinkLaunch(textstripped, Elevate);

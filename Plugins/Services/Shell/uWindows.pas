@@ -101,6 +101,14 @@ implementation
 
 uses uTaskManager;
 
+// Shell window registration. user32 keeps a single "shell window" handle that
+// GetShellWindow() - and the shell APIs built on it - return. With Explorer gone
+// that handle stays NULL unless the replacement shell claims it. Imported by name
+// (documented API, present on Windows 11) so the import cannot collide with a
+// declaration in Windows.pas.
+function SharpGetShellWindow: HWND; stdcall; external 'user32.dll' name 'GetShellWindow';
+function SharpSetShellWindow(hwnd: HWND): BOOL; stdcall; external 'user32.dll' name 'SetShellWindow';
+
 
 // Window related functions
 function GetWndList(Monitor: TMonitor): TWndArray;
@@ -470,6 +478,11 @@ begin
   begin
     SetProp(ShellTrayWnd, 'AllowConsentToStealFocus', 1);
     SetProp(ShellTrayWnd, 'TaskBandHWND', ShellTrayWnd);
+
+    // Claim the shell window only when nothing else owns it (Explorer owns it
+    // while it runs), so a co-existing Explorer is left untouched.
+    if SharpGetShellWindow = 0 then
+      SharpSetShellWindow(ShellTrayWnd);
   end;
 end;
 
@@ -513,6 +526,8 @@ begin
   begin
     RemoveProp(ShellTrayWnd,'AllowConsentToStealFocus');
     RemoveProp(ShellTrayWnd,'TaskBandHWND');    
+    if SharpGetShellWindow = ShellTrayWnd then
+      SharpSetShellWindow(0);
     DestroyWindow(ShellTrayWnd);
     Windows.UnregisterClass(PChar('Shell_TrayWnd'),hinstance)
   end;

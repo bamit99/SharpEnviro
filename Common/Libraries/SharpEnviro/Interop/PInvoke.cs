@@ -93,6 +93,11 @@ namespace SharpEnviro.Interop
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
+
+        // The shell window: Explorer's desktop window, or whichever shell claimed it
+        // through SetShellWindow. Used to tell whether Explorer is currently the shell.
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetShellWindow();
         [DllImport("user32.dll")]
         public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
         [DllImport("user32.dll")]

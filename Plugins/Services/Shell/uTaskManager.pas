@@ -39,7 +39,8 @@ uses Windows,
      JclSysUtils,
      JclStrings,
      JclSysInfo,
-     uSystemFuncs;
+     uSystemFuncs,
+     uDWMFuncs;
 
 type
   TTaskChangeEvent = procedure(pItem : TTaskItem; Index : integer) of object;
@@ -163,6 +164,12 @@ var
   rc: TRect;
 begin
   Result := False;
+
+  // Cloaked windows (suspended UWP/WinUI hosts, windows on another virtual
+  // desktop, shell-hosted surfaces) are reported as visible but must never
+  // become task buttons.
+  if IsWindowCloaked(pHandle) then
+    exit;
 
   GetClientRect(pHandle, rc);
 

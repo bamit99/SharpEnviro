@@ -40,6 +40,7 @@ uses
   VWMFunctions,
   {$IFDEF DEBUG}DebugDialog in '..\..\..\Common\Units\DebugDialog\DebugDialog.pas',{$ENDIF}
   uShutdown in '..\..\..\Common\Units\Shutdown\uShutdown.pas',
+  uDWMFuncs in '..\..\..\Common\Units\DWMApi\uDWMFuncs.pas',
   uSharpBar in '..\..\..\Components\SharpBar\uSharpBar.pas';
 
 type

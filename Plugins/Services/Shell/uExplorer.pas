@@ -88,7 +88,7 @@ begin
       else
         Dir := Dir + 'Addons\x86\Explorer.exe';
 
-      if (NETFramework35) and (FileExists(Dir)) then
+      if (IsDotNetFrameworkInstalled) and (FileExists(Dir)) then
         ShellExecute(0, nil, PChar(Dir), nil, nil, SW_SHOWNORMAL);
 
       iTimeout := 10000;

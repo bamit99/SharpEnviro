@@ -74,6 +74,20 @@ namespace SharpEnviro.Explorer
             bShellReady = true;
         }
 
+        /// <summary>
+        /// True while the real Explorer owns the shell window (its desktop window
+        /// class is "Progman"). When SharpEnviro is the shell the shell window is
+        /// SharpEnviro's own tray window, or NULL if nothing claimed it.
+        /// </summary>
+        private static bool ExplorerIsTheShell()
+        {
+            IntPtr shell = PInvoke.GetShellWindow();
+            if (shell == IntPtr.Zero)
+                return false;
+
+            return string.Equals(PInvoke.GetWindowClassName(shell), "Progman", StringComparison.OrdinalIgnoreCase);
+        }
+
         private static IntPtr SharpWindowProc(IntPtr hWnd, uint uMsgm, IntPtr wParam, IntPtr lParam)
         {
             /*if (uMsgm == uTaskbarMsg)
@@ -178,6 +192,15 @@ namespace SharpEnviro.Explorer
             // Send parameters to real explorer
             if (args.Length > 0)
             {
+                // Only while Explorer is the shell: starting explorer.exe while
+                // SharpEnviro is the shell brings up the genuine Windows 11 shell
+                // (desktop, taskbar, Start menu) alongside it.
+                if (!ExplorerIsTheShell())
+                {
+                    SharpDebug.Info("Explorer", "Ignoring shell arguments while SharpEnviro is the shell: " + string.Join(" ", args));
+                    return;
+                }
+
                 string cmdArgs = "";
                 foreach (string arg in args)
                 {

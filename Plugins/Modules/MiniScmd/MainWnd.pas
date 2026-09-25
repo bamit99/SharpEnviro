@@ -299,8 +299,8 @@ begin
       begin
         sSearch := RightStr(edit.Text, Length(edit.Text) - 2);
 
-        // Check if we are using .NET 3.5 and if SharpSearchNET.exe exists
-        if (uSystemFuncs.NETFramework35)
+        // Check if a usable .NET Framework is present and if the link launcher exists
+        if (uSystemFuncs.IsDotNetFrameworkInstalled)
             and (SysUtils.FileExists(GetSharpeDirectory + 'SharpLinkLauncherNET.exe'))
 
         edit.Text := '';

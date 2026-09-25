@@ -365,7 +365,9 @@ begin
     end;
 
     // Registers or unregisters an autohide appbar for an edge of the screen.
-    ABM_SETAUTOHIDEBAR: begin
+    // ABM_SETAUTOHIDEBAREX is the per-monitor variant; its extra monitor argument is
+    // intentionally ignored because uDeskArea.pas maintains a single global work area.
+    ABM_SETAUTOHIDEBAR, ABM_SETAUTOHIDEBAREX: begin
       ABItem := GetAppBarItem(msg.abd.Wnd);
       if ABItem <> nil then
       begin
@@ -386,7 +388,9 @@ begin
     end;
 
     // Retrieves the handle to the autohide appbar associated with an edge of the screen.
-    ABM_GETAUTOHIDEBAR: begin
+    // ABM_GETAUTOHIDEBAREX is the per-monitor variant; its extra monitor argument is
+    // intentionally ignored because uDeskArea.pas maintains a single global work area.
+    ABM_GETAUTOHIDEBAR, ABM_GETAUTOHIDEBAREX: begin
       ABItem := GetAutoHideAppBar(msg.abd.uEdge);
       if ABItem <> nil then
         result := ABItem.Data.abd.Wnd

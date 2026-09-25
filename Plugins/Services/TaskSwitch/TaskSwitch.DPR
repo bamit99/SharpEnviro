@@ -53,6 +53,7 @@ uses
   uTypes in '..\Shell\uTypes.pas',
   uWindows in '..\Shell\uWindows.pas',
   SWCmdList in '..\..\..\Common\Units\TaskFilterList\SWCmdList.pas',
+  uDWMFuncs in '..\..\..\Common\Units\DWMApi\uDWMFuncs.pas',
   TaskFilterList in '..\..\..\Common\Units\TaskFilterList\TaskFilterList.pas';
 
 type

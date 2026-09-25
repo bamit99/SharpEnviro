@@ -58,6 +58,7 @@ if $(Configuration)==Debug del "$(OUTPUTDIR)$(OUTPUTNAME).map"</PostBuildEvent>
     </DelphiCompile>
     <DCCReference Include="..\..\..\Common\Libraries\SharpAPI\SharpAPI.pas" />
     <DCCReference Include="..\..\..\Common\Units\DebugDialog\DebugDialog.pas" />
+    <DCCReference Include="..\..\..\Common\Units\DWMApi\uDWMFuncs.pas" />
     <DCCReference Include="..\..\..\Common\Units\SystemFuncs\uSystemFuncs.pas" />
     <DCCReference Include="..\..\..\Common\Units\VWM\VWMFunctions.pas" />
     <DCCReference Include="uDeskArea.pas" />

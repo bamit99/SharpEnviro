@@ -160,8 +160,7 @@ function GetKnownFolderPath(const rfid: TGUID) : WideString;
 implementation
 
 uses
-  SysUtils,
-  uVistaFuncs;
+  SysUtils;
 
 const
   SHELL32_DLL : String = 'SHELL32.DLL';
@@ -197,11 +196,9 @@ function GetKnownFolderPath(const rfid: TGUID) : WideString;
 var
   OutPath : PWideChar;
 begin
-  if (not IsWindows7) and (not IsWindowsVista) then
-  begin
-    Result := #0;
-    exit;
-  end;
+  // No OS-version guard: SHGetKnownFolderPath is resolved dynamically and only
+  // exists from Vista on, so on anything older the call below fails and the
+  // function returns #0.
   
   if ShGetKnownFolderPath(rfid, 0, 0, OutPath) >= 0 then
     Result := OutPath

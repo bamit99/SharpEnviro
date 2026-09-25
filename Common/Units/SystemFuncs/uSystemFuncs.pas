@@ -18,7 +18,7 @@ const
 procedure SetForegroundWindowEx(Wnd: HWND);
 function HasWriteAccess(pFile : String) : boolean;  
 function IsWow64(): boolean;
-function NETFramework35: Boolean;
+function IsDotNetFrameworkInstalled: Boolean;
 function FindAllWindows(const WindowClass: string): THandleArray;
 function ForceForegroundWindow(hwnd: THandle): Boolean;
 function GetMouseDown(vKey: Integer): Boolean;
@@ -262,17 +262,44 @@ begin
   end;
 end;                                             
 
-function NETFramework35: Boolean;
+// Returns True when a .NET Framework that the managed SharpE components can run
+// on is present. Those components target .NET Framework 4.8, which ships with
+// Windows 10/11 but is a separate download on the older systems, so this checks
+// the v4 "Full" release value. The 3.5 key is still honoured for installations
+// that enabled it explicitly (Windows 11 only offers 3.5 as an optional feature,
+// and not at all from 26H1 on).
+function IsDotNetFrameworkInstalled: Boolean;
+const
+  KEY_V4_FULL = 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full';
+  KEY_V35     = 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5';
+  // .NET Framework 4.8 release value (528040 = 4.8, >= 533320 = 4.8.1)
+  DOTNET_48_RELEASE = 528040;
 var
   Reg: TRegistry;
+  Release: Integer;
 begin
   Result := False;
-  Reg := TRegistry.Create(KEY_READ);
+  Release := 0;
+
+  // KEY_WOW64_64KEY makes the read view independent of the process bitness
+  Reg := TRegistry.Create(KEY_READ or KEY_WOW64_64KEY);
   try
     Reg.RootKey := HKEY_LOCAL_MACHINE;
-    if Reg.OpenKey('SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5', False) then
-      if Reg.ReadBool('Install') then
-        result := True;
+    if Reg.OpenKey(KEY_V4_FULL, False) then
+    try
+      Release := Reg.ReadInteger('Release');
+    except
+      Release := 0; // key exists but carries no Release value (e.g. Client Profile)
+    end;
+
+    if Release >= DOTNET_48_RELEASE then
+      Result := True
+    else if Reg.OpenKey(KEY_V35, False) then
+    try
+      Result := Reg.ReadBool('Install');
+    except
+      Result := False;
+    end;
   finally
     Reg.Free
   end;

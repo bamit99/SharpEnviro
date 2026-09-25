@@ -54,7 +54,8 @@ implementation
 
 uses
   uSystemFuncs,
-  SharpApi;
+  SharpApi,
+  uDWMFuncs;
 
 function PointInRect(P : TPoint; Rect : TRect) : boolean;
 begin
@@ -178,6 +179,14 @@ var
 
   function EnumWindowsProc(Wnd: HWND; LParam: LPARAM): BOOL; stdcall;
   begin
+    // Skip cloaked windows (suspended UWP/WinUI hosts, windows on another
+    // virtual desktop, shell-hosted surfaces) so they never enter the list.
+    if IsWindowCloaked(Wnd) then
+    begin
+      result := True;
+      exit;
+    end;
+
     if ((GetWindowLong(Wnd, GWL_STYLE) and WS_SYSMENU <> 0) or
        (GetWindowLong(Wnd, GWL_EXSTYLE) and WS_EX_APPWINDOW <> 0)) and
        ((IsWindowVisible(Wnd) or IsIconic(wnd)) and

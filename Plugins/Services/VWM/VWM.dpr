@@ -43,6 +43,7 @@ uses
   {$IFDEF DEBUG}DebugDialog in '..\..\..\Common\Units\DebugDialog\DebugDialog.pas',{$ENDIF}
   VWMFunctions in '..\..\..\Common\Units\VWM\VWMFunctions.pas',
   uSystemFuncs in '..\..\..\Common\Units\SystemFuncs\uSystemFuncs.pas',
+  uDWMFuncs in '..\..\..\Common\Units\DWMApi\uDWMFuncs.pas',
   SharpNotify in '..\..\..\Common\Units\SharpNotify\SharpNotify.pas';
 
 {$R 'VersionInfo.res'}
