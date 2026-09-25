@@ -1,0 +1,16 @@
+﻿=== SetShellWindow with a self-owned window @ 2026-09-25 17:09:48 ===
+session=1  admin=True
+
+original shell window = NULL  0x0  ownerPid=0
+this process pid      = 7992
+created my window     = Static  0x70086  ownerPid=7992
+  (ownerPid == this process pid => it is mine)
+
+SetShellWindow(MY window)  -> returned True  GetLastError=0
+GetShellWindow() now       = Static  0x70086
+  => WORKS: a process CAN claim the shell window with its own window
+
+restore SetShellWindow(original) -> returned False  GetLastError=1400
+GetShellWindow() after restore   = Static  0x70086
+  restored correctly = False
+

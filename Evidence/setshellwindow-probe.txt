@@ -1,0 +1,21 @@
+﻿=== SetShellWindow viability probe @ 2026-09-25 17:07:04 ===
+session=1
+user32.dll base = 0x7FFD76D70000
+  GetShellWindow   export present @ 0x7FFD76DBF570
+  SetShellWindow   export present @ 0x7FFD76DD9730
+
+GetShellWindow() before = Progman
+  hwnd 0x20194
+
+SetShellWindow(current) returned False  GetLastError=5
+GetShellWindow() after  = Progman  hwnd 0x20194
+
+  => SetShellWindow did NOT behave as expected - the fix premise needs revisiting
+
+--- shell consumers that depend on GetShellWindow ---
+  (these are what break when the shell window is NULL)
+  GetShellWindow             exported
+  SetShellWindow             exported
+  GetTaskmanWindow           exported
+  SetTaskmanWindow           exported
+  RegisterShellHookWindow    exported

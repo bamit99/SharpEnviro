@@ -343,6 +343,36 @@ Not run: DPI at 150 % (needs a display change and a logoff), and the `NetFx3`
 enable/disable cycle (the feature is `DisabledWithPayloadRemoved`, no payload to
 enable from).
 
+## Why the Delphi half cannot be built here
+
+Checked on both host and VM: **no Delphi, no FPC, no Lazarus, anywhere**
+(`dcc32`/`dcc64`/`bds`/`lazbuild`/`fpc` absent; no `Embarcadero`/`CodeGear`/
+`Borland`/`Lazarus` directories; nothing found on the drives).
+
+What the code actually requires:
+
+| Evidence | Meaning |
+| --- | --- |
+| `SharpCompileD2007.xml` at the repo root | declared target is **Delphi 2007** |
+| `ShareMem` in `SharpAPI.dpr`, `SharpAPIEx.dpr`, `SharpCenterAPI.dpr`, `SharpDeskApi.dpr` | Delphi's shared memory manager, shipped as `BorlndMM.dll` |
+| `PAnsiChar` in `uWindows.pas` | ANSI-era compiler semantics (Delphi 2007 is the last ANSI release) |
+| 811 `.pas/.dpr/.inc` + **159 `.dfm`** | VCL forms throughout — `Forms`, `Controls`, `Graphics`, `Dialogs`, `ExtCtrls` |
+| `GR32` + `Common/Delphi Components` | third-party/custom VCL packages must compile first |
+| fixes span 6 projects | `Shell`, `Taskbar`, `TaskSwitch`, `VWM`, `SharpAPI`, `SharpEComponents` |
+
+`choco search` finds **`lazarus 4.0.0`** (FPC) — the only free Pascal toolchain
+available — plus `embarcaderodevcpp` (C++, not Delphi). FPC is **not** a
+substitute: it cannot emit a module ABI-compatible with Delphi's
+`ShareMem`/`BorlndMM` allocator, the code is ANSI-era Delphi, and the VCL plus the
+custom component packages would need porting. Delphi 2007 itself is discontinued
+and license-gated.
+
+**Consequence:** the `.pas`/`.dpr` fixes are verified as a *diagnosis* — phase 5
+confirmed every defect they address, and the critical API premise was proven
+empirically (`SetShellWindow` succeeds only while the shell window is NULL, which is
+exactly why the `if SharpGetShellWindow = 0` guard is required) — but no fix has ever
+been compiled into a binary.
+
 ## Phase 0 baseline — CONFIRMED clean (2026-09-25 16:25, after reboot)
 
 Verified from **inside session 1** (`Evidence/session1-shell.txt`):
