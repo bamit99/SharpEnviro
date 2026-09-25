@@ -438,3 +438,7 @@ FodyWeavers.xsd
 
 *.lib
 *.exp
+
+# --- win11 VM test evidence (VMware shared folder target) ---
+Evidence/
+test/win11/evidence/
