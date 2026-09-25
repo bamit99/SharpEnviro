@@ -79,18 +79,74 @@ working-set noise: the collector ran, the patcher never did.
 Use **`run-phase3.ps1`** (in this folder), which reverts the shell first, verifies
 quiescence, then patches with `-Force`.
 
-### Open risk — re-validate the patch *in the VM*
+### Access: working (2026-09-25)
 
-An **earlier revision** of the patcher failed **10/10 in the VM** with
-`manifest language count = 0x0000,0x0000,…` garbage (session log
-`117`, `138`, `221` under `~/.omp/agent/sessions/--E--Git--/`), while the
-**current** revision patched **10/10 on the host** (9 via the resource API,
-`SharpSplash.exe` via the `mt.exe` fallback) and passed an independent `mt.exe`
-readback. Host success is **not** VM success. Phase 3 in the VM is the real test.
+WinRM works with the **`ompadmin`** account — not `amitb`:
+
+```powershell
+$c = New-Object System.Management.Automation.PSCredential(
+       'SHARPENVIRO\ompadmin', (ConvertTo-SecureString 'Password1!' -AsPlainText -Force))
+Invoke-Command -ComputerName 192.168.34.129 -Credential $c -ScriptBlock { whoami }
+# -> sharpenviro\ompadmin, full admin token, 64-bit PowerShell
+```
+
+`sharpenviro\amitb` (the account SharpE runs as) is denied over WinRM. Use
+`ompadmin`, which is also how you can stop a SharpE process owned by `amitb`.
+
+**Execution policy is `Restricted` on the VM.** `-ExecutionPolicy Bypass` on the
+*host* shell does not carry over. Set it inside the remote session first:
+
+```powershell
+Invoke-Command ... -ScriptBlock {
+  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+  & '\\vmware-host\Shared Folders\Evidence\patch-manifests.ps1' ...
+}
+```
+
+## Phase 3 — DONE and verified in the VM (2026-09-25 16:15)
+
+The earlier VM failure (`manifest language count = 0x0000,…`) is **gone** with the
+current patcher. Results in `Evidence/phase3-results.txt`:
+
+- **`patched 10, skipped 2, failed 0`** — `SharpSkin.exe`/`SharpScript.exe` not
+  installed; `SharpSplash.exe` via the `mt.exe` fallback after the resource API
+  broke its PE (`bad e_lfanew`).
+- `supportedOS=True` on every patched EXE; independent `mt.exe` readback shows the
+  Win10 GUID on all, with `SharpAdmin.exe` still `requireAdministrator` and the
+  rest `asInvoker`.
+- **Behavioural proof of the manifest fix** (the phase-3 point), via a
+  `GetVersionExW` probe built with the in-box `csc`:
+
+  | Build | `GetVersionExW` | Delphi `Win32MajorVersion` |
+  |---|---|---|
+  | unmanifested (the 2011 EXEs) | `6.2.9200` | **6** — "Windows 8" |
+  | manifested (this fix) | `10.0.26200` | **10** — real build |
+
+  `OSVERSIONINFOEXW` must be the full 284-byte shape or `GetVersionExW` fails
+  outright rather than reporting a shimmed version.
+
+Also done: install dir backed up to `C:\SharpEnviro-backup-20260925-161425`
+(2552 files, 144.2 MB, verified), and pre-change registry captured to
+`Evidence/reg-before-20260925-161425.txt`.
+
+## Shell reverted (2026-09-25 16:14)
+
+The machine was mid-takeover; it is now back to a stock shell:
+
+- `IniFileMapping\system.ini\boot\Shell` = `SYS:Microsoft\...\Winlogon` (was `USR:`)
+- `HKLM\...\Winlogon\Shell` = `explorer.exe`
+- `amitb`'s `HKCU\...\Winlogon\Shell` removed (was `...\SharpCore.exe -startup`)
+
+Note the **64-bit vs 32-bit registry view**: the 64-bit view held the `USR:` redirect
+while the 32-bit view (and `WOW6432Node`) still read `SYS:`. That is why a 32-bit
+collector on the same machine reported the stock value. Check `/reg:64` explicitly.
+
+SharpE processes were stopped for the patch and have **not** been restarted, so the
+next logon should come up as a plain Windows 11 desktop.
 
 ## Next steps
 
-1. In the VM, elevated: `powershell -ExecutionPolicy Bypass -File Z:\run-phase3.ps1`
-   (reverts shell → patches → verifies).
-2. Snapshot the clean desktop as `phase-0-baseline`.
-3. Phase 4: `SetShell.exe`, reboot — only once the snapshot exists.
+1. **Snapshot as `phase-0-baseline`** — still the outstanding prerequisite; the
+   black-screen risk of phase 4 has no rollback without it.
+2. Phase 4: `<install>\SetShell.exe`, reboot.
+3. Phases 5–7 (architectural checks, rebuilt managed components, .NET 3.5 gate).
