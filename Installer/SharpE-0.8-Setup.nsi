@@ -269,7 +269,15 @@ Section "!Core Files" SEC01
   # File "..\..\SharpE\Addons\x64\nlog.dll"
   # File "..\..\SharpE\Addons\x64\Explorer.exe.config"
   File "..\..\SharpE\Addons\x64\System.Data.SQLite.dll"
-  
+
+  # SQLite native interop for the .NET 4.8 System.Data.SQLite build. It is not optional:
+  # the 1.0.118 assembly P/Invokes SQLite.Interop.dll, which it probes in <assembly dir>\x64
+  # and <assembly dir>\x86 (the 2011 fully managed build had no such dependency).
+  SetOutPath "$INSTDIR\Addons\x64\x64\"
+  File "..\..\SharpE\Addons\x64\x64\SQLite.Interop.dll"
+  SetOutPath "$INSTDIR\Addons\x64\x86\"
+  File "..\..\SharpE\Addons\x64\x86\SQLite.Interop.dll"
+
   # Center
   SetOutPath "$INSTDIR\Center\"
   File /r "..\..\SharpE\Center\*.*"
