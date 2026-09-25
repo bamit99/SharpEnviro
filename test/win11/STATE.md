@@ -144,12 +144,58 @@ collector on the same machine reported the stock value. Check `/reg:64` explicit
 SharpE processes were stopped for the patch and have **not** been restarted, so the
 next logon should come up as a plain Windows 11 desktop.
 
+## Phase 6 part 1 — done, on the Explorer desktop (2026-09-25 16:34)
+
+Ran *before* phase 4 on purpose: one half of the guard test needs Explorer to be
+the shell, which is gone once SharpE takes over.
+
+Managed components dropped into `Addons\x64\` (backed up to `Addons\x64.orig`,
+8 files). All TESTPLAN §3b.3 disk assertions hold:
+
+| Check | Value |
+| --- | --- |
+| `System.Data.SQLite.dll` | **431,792** (not 1,102,336) |
+| `Addons\x64\x64\SQLite.Interop.dll` | present |
+| `Addons\x64\Explorer.exe` | **19,456** |
+| native 2011 `Explorer.dll` | untouched (517,120) |
+| `SharpLinkLauncherNET.exe` no args | exit **-1** (`InvalidNumberArguments`) |
+| `SharpLinkLauncherNET.exe -l:fake.lnk -t:100 -e` | exit **-4** (`Timeout`) |
+
+### Guard test (`Explorer.exe C:\Windows`) — PASS
+
+`Components/ExplorerNET/Program.cs` forwards args to the real explorer only when
+`ExplorerIsTheShell()`. Measured in the interactive session:
+
+```
+GetShellWindow() = 0x100FA class=Progman
+before: explorer pids = [5940]           visible CabinetWClass = 0
+after : explorer pids = [5940, 8840]     visible CabinetWClass = 1
+verdict: a File Explorer window APPEARED -> guard forwarded to the real shell
+```
+
+### Confirmed defect: the guard is session-dependent
+
+`ExplorerIsTheShell()` calls `GetShellWindow()`, which is **per-session**:
+
+```
+session 0 (WinRM):  GetShellWindow() = NULL    -> ExplorerIsTheShell() = False
+session 1 (interactive): class=Progman         -> ExplorerIsTheShell() = True
+```
+
+So when `Explorer.exe` with args is launched from a non-interactive context, the
+guard concludes *"SharpEnviro is the shell"* even when Explorer is, logs
+`Ignoring shell arguments while SharpEnviro is the shell`, and **swallows the
+arguments**. Impact is low (the addon is normally started from the interactive
+desktop), but it is wrong, and it is the same per-session trap that produced the
+false "no shell" reading earlier. A `Progman` lookup in the *logged-on* session
+(or an explicit session check) would be correct.
+
 ## Next steps
 
-1. **Snapshot as `phase-0-baseline`** — the desktop is verified clean (below), so
-   now is the moment. The black-screen risk of phase 4 has no rollback without it.
-2. Phase 4: `<install>\SetShell.exe`, reboot.
-3. Phases 5–7 (architectural checks, rebuilt managed components, .NET 3.5 gate).
+1. **Phase 4**: set the shell as `SetShell.exe` would, then reboot - snapshot
+   `phase-0-baseline` is the rollback.
+2. Then the SharpE-as-shell half of phase 6 (guard must NOT start a second shell)
+   and phases 5 / 7.
 
 ## Phase 0 baseline — CONFIRMED clean (2026-09-25 16:25, after reboot)
 
