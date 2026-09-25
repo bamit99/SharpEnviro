@@ -7,8 +7,9 @@ name: build-managed
 # which are not freely obtainable. Only the C# components are built.
 #
 # The x86 project list deliberately mirrors the installer's tree, which nests the
-# native Explorer.dll and the C# desktop host in Addons\86 (x86) vs Addons\x64\
-# (x64). The native Addons\x86\Explorer.exe remains 2011 stock.
+# native Explorer.dll and the C# desktop host in Addons\x86\ (x86) vs Addons\x64\
+# (x64). Explorer.exe is the *managed* host and is rebuilt for both architectures;
+# it is the native Explorer.dll beside it that stays 2011 stock.
 
 on:
   push:
@@ -57,8 +58,9 @@ jobs:
           $rootProjects = @(
             'Components/SharpLinkLauncherNET/SharpLinkLauncherNET.csproj'
           )
-          # x86: the installer's x86 tree hosts only the libraries and the desktop
-          # host; the native Addons\x86\Explorer.exe stays as shipped in 2011.
+          # x86: the installer's x86 tree hosts only the libraries and the managed
+          # desktop host - no root-level executables. The native Explorer.dll
+          # beside the host stays as shipped in 2011.
           if ($platform -eq 'x86') {
             $rootProjects = @()
           }
