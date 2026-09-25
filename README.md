@@ -10,9 +10,9 @@ whose purpose is to make that shell usable on Windows 11 (build 22000+).
 All original code is by the SharpEnviro Development Team — see
 [Credits](#credits). This fork adds only the compatibility work described below.
 
-> **Status: preview.** The manifest fix is verified end-to-end; the shell takeover
-> itself has not yet been validated on Windows 11. Read
-> [Windows 11 status](#windows-11-status) before installing.
+> **Status: preview.** Tested end-to-end in a Windows 11 VM (25H2, build 26200) —
+> the shell takeover works and the known defects are now measured rather than
+> predicted. Read [Windows 11 status](#windows-11-status) before installing.
 
 ---
 
@@ -52,14 +52,20 @@ rebuilt Delphi binary still requires a Delphi 2007+ toolchain.
 
 ### What is verified
 
-Verified in a Windows 11 VM (25H2 / build 26200):
+Verified in a Windows 11 VM (25H2 / build 26200), phases 0-8 of `test/win11/TESTPLAN.md`:
 
+- **shell takeover works** — at logon `SharpCore`/`SharpBar`/`SharpDesk` start and the
+  whole Windows 11 shell stack does not; SharpE owns a `Shell_TrayWnd`
+- **recovery works** — `recover-shell.cmd` restores Explorer as the shell
 - manifest injection: 10/10 executables, `supportedOS` present, execution levels preserved
 - the `GetVersionExW` before/after shown above
 - the .NET 4.8 managed components load and run: `System.Data.SQLite.dll` 1.0.118
-  (431,792 bytes) with its `x64\SQLite.Interop.dll`, desktop host `Explorer.exe` 19,456 bytes
+  (431,792 bytes) with its `x64\SQLite.Interop.dll`; desktop host `Explorer.exe` 19,456 bytes
 - `SharpLinkLauncherNET.exe` argument handling (exit `-1` with no arguments, `-4` on timeout)
-- the `ExplorerNET` argument guard forwards to the real shell while Explorer is the shell
+- the `ExplorerNET` argument guard works both ways: forwards to the real shell while
+  Explorer is the shell, and refuses to start a second shell while SharpE is
+- the `.NET 3.5` gate is demonstrably false on stock Windows 11: the .NET 4.8 desktop
+  host is present and correct on disk and still never starts
 
 ### Known issues
 
@@ -68,9 +74,17 @@ Verified in a Windows 11 VM (25H2 / build 26200):
   (e.g. a service or session 0) it returns `NULL` and the guard wrongly concludes
   SharpEnviro is the shell, swallowing shell arguments. The addon is normally
   launched from the interactive desktop, so real-world impact is low.
-- The shell takeover on Windows 11 (two competing shells, tray ownership,
-  work-area handling, UIPI, DPI) has **not** been validated yet. See the test
-  plan in `test/win11/TESTPLAN.md` on the `win11-vmtest` branch.
+- **SharpE never claims the shell window.** `GetShellWindow()` returns `NULL`
+  while SharpE owns a `Shell_TrayWnd`, because `SetShellWindow` is never called.
+  shell32 therefore cannot find it, which is why tray and "show desktop"
+  hand-offs land in the wrong process.
+- **Starting `explorer.exe` brings back the whole Windows 11 shell**, and Explorer
+  then takes the shell window from SharpE (two `Shell_TrayWnd` windows compete).
+  SharpE's takeover is not exclusive.
+- **The bar reserves no work area.** SharpE registers no AppBar, so the work area
+  keeps a stale margin and maximised windows cover the bar.
+- **Elevated windows cannot be driven** (UIPI): a medium-integrity bar cannot
+  minimise or activate a high-integrity window, so those task buttons are inert.
 - DPI awareness is still the 2011 behaviour; SharpE is not per-monitor DPI aware.
 
 ---
