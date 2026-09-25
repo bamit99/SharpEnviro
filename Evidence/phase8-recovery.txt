@@ -1,0 +1,17 @@
+﻿=== phase 8 recovery @ 2026-09-25 17:02:44 ===
+user=sharpenviro\amitb session=1 admin=True
+
+--- before ---
+  amitb HKCU Shell = C:\Program Files (x86)\SharpEnviro\SharpCore.exe -startup
+  SharpE: SharpBar,SharpBar,SharpCore,SharpDesk
+  explorer: 
+
+--- running recover-shell.cmd ---
+  exit code = 0
+
+--- after ---
+  SharpE: 
+  explorer: 
+  HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\IniFileMapping\system.ini\boot -> Shell REG_SZ SYS:Microsoft\Windows NT\CurrentVersion\Winlogon
+  HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon -> Shell REG_SZ explorer.exe
+  HKCU Shell (amitb) = ''

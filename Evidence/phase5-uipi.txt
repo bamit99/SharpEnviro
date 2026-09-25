@@ -1,0 +1,18 @@
+﻿=== phase 5 UIPI (WM_CLOSE probe) @ 2026-09-25 17:01:28 ===
+user=sharpenviro\amitb  session=1
+driver integrity = Medium
+claims Administrator = False
+
+--- CONTROL: medium-integrity window (wscript MsgBox) ---
+  pid=3616 integrity=Medium hwnd=0x5045A  title='UIPI control'
+  posted WM_CLOSE -> process CLOSED
+  => probe WORKS: a medium-integrity window CAN be driven by a medium process
+
+--- TARGET: high-integrity window (created by an elevated task) ---
+  pid=8760 integrity=High hwnd=0x704A0  title='Untitled - Notepad'
+    posted WM_CLOSE  -> process SURVIVED
+    => REFUSED - UIPI blocked the medium-integrity caller (EXPECTED)
+
+SharpE's bar runs at medium integrity (it is started by the user shell, unelevated),
+so the same rule applies to its taskbar buttons on elevated windows: the window
+cannot be minimised/activated, and the button becomes inert.

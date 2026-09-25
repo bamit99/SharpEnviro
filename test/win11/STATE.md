@@ -293,11 +293,55 @@ The plan's enable/disable cycle (enable NetFx3 → host starts → disable → s
 not run: `NetFx3` is `DisabledWithPayloadRemoved`, so enabling it needs an install
 source. The gate's *decision* on this machine is proven regardless.
 
-## Next steps
+## Phase 5 remainder — UIPI: CONFIRMED (17:01)
 
-1. Phase 5 remainder: UIPI (admin Notepad vs bar) and DPI at 150 %.
-2. Optional: enable `NetFx3` (needs a payload source) to watch the host start.
-3. Restore: `recover-shell.cmd`, then a `-reverted` evidence pass.
+Tested unambiguously by posting `WM_CLOSE` from a **medium**-integrity process
+(`ShowWindow`'s return value cannot detect a UIPI block — it means "was previously
+visible"). Includes a control, so "allowed" is distinguishable from "probe broken":
+
+| Window | Integrity | Result |
+| --- | --- | --- |
+| control (wscript MsgBox) | Medium → Medium | **CLOSED** — probe works |
+| target (Notepad, from an elevated task) | Medium → **High** | **SURVIVED** — blocked |
+
+SharpE's bar runs at medium integrity, so its task buttons on an elevated window
+cannot minimise/activate it: the button is inert. Matches the plan's prediction.
+
+Gotchas found while building this: classic Notepad is single-instance (a second
+launch hands off to the existing window, so it cannot be both control and target),
+and `Start-Process -Verb RunAs` from WinRM lands in session 0, not the desktop —
+the elevated target must be created by a `RunLevel Highest` session-1 task.
+
+## Phase 8 — recovery: WORKS (17:02)
+
+`recover-shell.cmd` (run elevated in session 1) exits 0 and:
+
+- stops `SharpCore`/`SharpBar`×2/`SharpDesk`
+- restores `IniFileMapping` to `SYS:`, `HKLM Winlogon\Shell` to `explorer.exe`
+- clears `amitb`'s `HKCU Shell`
+
+One caveat: the script's own `start "" explorer.exe` did not take when invoked from
+a hidden `cmd` (explorer was not running afterwards). Starting it explicitly
+brought the shell straight back — `GetShellWindow()` = `Progman` (explorer 4908),
+`Shell_TrayWnd` owned by explorer, work area back to the real 48px taskbar.
+Worth fixing in `recover-shell.cmd` so recovery is genuinely one step.
+
+## Round-1 status: phases 0-8 all exercised
+
+| Phase | Result |
+| --- | --- |
+| 0 baseline | clean Explorer desktop confirmed |
+| 1b install | disk assertions pass (SQLite 431792, x64 interop, Explorer.exe 19456) |
+| 2-3 manifests | 10/10 patched; `GetVersionExW` 6.2.9200 → 10.0.26200 proven |
+| 4 shell takeover | works — SharpE owns the shell at logon |
+| 5 architecture | 4 defects confirmed: no `SetShellWindow`; two shells and Explorer wins; no AppBar work area; cloak phantom buttons; UIPI blocks elevated windows |
+| 6 managed drop-in | guard passes both ways; components load; exit codes -1/-4 |
+| 7 .NET gate | `NDP\v3.5\Install` absent → gate FALSE → 4.8 host never starts |
+| 8 recovery | works; one fix needed in `recover-shell.cmd` |
+
+Not run: DPI at 150 % (needs a display change and a logoff), and the `NetFx3`
+enable/disable cycle (the feature is `DisabledWithPayloadRemoved`, no payload to
+enable from).
 
 ## Phase 0 baseline — CONFIRMED clean (2026-09-25 16:25, after reboot)
 

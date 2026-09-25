@@ -1,27 +1,25 @@
-﻿=== phase 5 @ 2026-09-25 16:48:59 ===
+﻿=== phase 5 @ 2026-09-25 17:03:51 ===
 user=sharpenviro\amitb  session=1  interactive=True
 
 --- shell window ---
-  GetShellWindow() = 0x100FA  class=Progman  title='Program Manager'  owner=explorer(5940)
+  GetShellWindow() = 0x20194  class=Progman  title='Program Manager'  owner=explorer(4908)
   => writes phase5-explorer-shell.txt
 
 --- Shell_TrayWnd family (tray ownership) ---
-  Shell_TrayWnd              present  0x100D6  owner=explorer(5940)
+  Shell_TrayWnd              present  0x300D2  owner=explorer(4908)
   Shell_SecondaryTrayWnd     absent
   NotifyIconOverflowWindow   absent
   TrayNotifyWnd              absent
   Progman                    absent
-  WorkerW                    present  0x10148  owner=explorer(5940)
+  WorkerW                    present  0x2017A  owner=explorer(4908)
 
 --- all visible top-level windows ---
-  CabinetWClass                  explorer(8840)   cloaked=0 'Windows - File Explorer'
-  CASCADIA_HOSTING_WINDOW_CLASS  WindowsTerminal(8312) cloaked=0 'Command Prompt'
-  DummyDWMListenerWindow         explorer(5940)   cloaked=1 ''
-  EdgeUiInputTopWndClass         explorer(5940)   cloaked=1 ''
-  Progman                        explorer(5940)   cloaked=0 'Program Manager'
-  PseudoConsoleWindow            cmd(9156)        cloaked=0 ''
-  Shell_TrayWnd                  explorer(5940)   cloaked=0 ''
-  VMwareDragDetWndClass          vmtoolsd(8800)   cloaked=0 ''
+  DummyDWMListenerWindow         explorer(4908)   cloaked=1 ''
+  EdgeUiInputTopWndClass         explorer(4908)   cloaked=1 ''
+  Progman                        explorer(4908)   cloaked=0 'Program Manager'
+  Shell_TrayWnd                  explorer(4908)   cloaked=0 ''
+  VMwareDragDetWndClass          vmtoolsd(5344)   cloaked=0 ''
+  Windows.UI.Core.CoreWindow     CalculatorApp(8036) cloaked=2 'Calculator'
 
 --- work area (bar space reservation) ---
   SPI_GETWORKAREA  = L0 T0 R2138 B711  (2138x711)
