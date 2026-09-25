@@ -1,0 +1,8 @@
+# Binary inputs — see README.md "Required inputs". Kept out of the repo.
+payload/
+managed-x64/
+mt/
+*.exe
+evidence/
+evidence-*.txt
+!evidence-EXAMPLE-host-win11-25H2.txt

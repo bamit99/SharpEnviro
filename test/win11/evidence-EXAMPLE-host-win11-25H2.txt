@@ -1,0 +1,144 @@
+﻿
+==============================================================================
+OPERATING SYSTEM
+==============================================================================
+ProductName                                    Windows 10 Pro
+DisplayVersion                                 25H2
+CurrentBuildNumber                             26200
+UBR (revision)                                 9457
+EditionID                                      Professional
+OSArchitecture                                 True
+ProcessIs64Bit                                 True
+Desktop LogPixels                              144
+Win32_ComputerSystem Model                     MS-7C91
+VM detection                                   Micro-Star International Co., Ltd.
+SecureBoot                                     2,5
+
+==============================================================================
+SHELL REGISTRATION (what will start after next logon)
+==============================================================================
+HKCU ...\Winlogon\Shell                        <not set>
+HKLM ...\Winlogon\Shell                        explorer.exe
+HKLM ...\Winlogon\Userinit                     C:\WINDOWS\system32\userinit.exe,
+HKLM IniFileMapping system.ini\boot\Shell      SYS:Microsoft\Windows NT\CurrentVersion\Winlogon
+HKCU ...\Explorer\DesktopProcess               <not set>
+HKLM SharpEnviro\Path                          <not set>
+
+==============================================================================
+SHELL WINDOW (GetShellWindow)
+==============================================================================
+handle                                         65886
+class                                          Progman
+pid                                            20620 (explorer)
+
+==============================================================================
+.NET FRAMEWORK STATE (the Delphi gate reads NDP\v3.5; the managed binaries need 4.8)
+==============================================================================
+64-bit view  v3.5\Install                      1
+64-bit view  v4\Full\Release                   533509  (>= 4.8)
+32-bit view  v3.5\Install                      1
+32-bit view  v4\Full\Release                   533509  (>= 4.8)
+
+==============================================================================
+PROCESSES OF INTEREST
+==============================================================================
+explorer                                       pid=20620 started=11:00:57 ws=5,96,052KB C:\WINDOWS\Explorer.EXE
+SharpCore                                      <not running>
+SharpBar                                       <not running>
+SharpDesk                                      <not running>
+SharpMenu                                      <not running>
+SharpCenter                                    <not running>
+SharpConsole                                   <not running>
+Explorer                                       pid=20620 started=11:00:57 ws=5,96,052KB C:\WINDOWS\Explorer.EXE
+SharpShellServicesNET                          <not running>
+SharpShellServices                             <not running>
+SharpSearchNET                                 <not running>
+SharpLinkLauncherNET                           <not running>
+TaskSwitch                                     <not running>
+VWM                                            <not running>
+Shell                                          <not running>
+SystemTray                                     <not running>
+ShellExperienceHost                            pid=6596 started=11:01:02 ws=1,25,836KB C:\WINDOWS\SystemApps\ShellExperienceHost_cw5n1h2txyewy\ShellExperienceHost.exe
+StartMenuExperienceHost                        pid=33092 started=11:00:59 ws=2,90,860KB C:\Windows\SystemApps\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\StartMenuExperienceHost.exe
+SearchHost                                     pid=2992 started=11:00:59 ws=1,77,860KB C:\WINDOWS\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe
+
+==============================================================================
+TOP-LEVEL WINDOWS (class competition evidence for Shell_TrayWnd et al.)
+==============================================================================
+visible top-level windows: 34
+
+--- tray / taskbar / desktop related ---
+Progman                    pid=20620  explorer               visible=True   cloaked=0 title=Program Manager
+Shell_TrayWnd              pid=20620  explorer               visible=True   cloaked=0 title=
+
+--- cloaked windows (must never become task buttons) ---
+ApplicationManager_DesktopShellWindow pid=20620  explorer               visible=False  cloaked=2 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+EdgeUiInputTopWndClass     pid=20620  explorer               visible=True   cloaked=1 title=
+IME                        pid=20620  explorer               visible=False  cloaked=2 title=Default IME
+IME                        pid=33224  PowerToys.QuickAccess  visible=False  cloaked=1 title=Default IME
+IME                        pid=38020  Microsoft.CmdPal.UI    visible=False  cloaked=1 title=Default IME
+IME                        pid=5880   TextInputHost          visible=False  cloaked=2 title=Default IME
+MSCTFIME UI                pid=20620  explorer               visible=False  cloaked=2 title=MSCTFIME UI
+MSCTFIME UI                pid=33224  PowerToys.QuickAccess  visible=False  cloaked=1 title=MSCTFIME UI
+MSCTFIME UI                pid=38020  Microsoft.CmdPal.UI    visible=False  cloaked=1 title=MSCTFIME UI
+ThumbnailDeviceHelperWnd   pid=20620  explorer               visible=True   cloaked=1 title=
+Windows.UI.Core.CoreWindow pid=5880   TextInputHost          visible=True   cloaked=2 title=Windows Input Experience
+WinUIDesktopWin32WindowClass pid=33224  PowerToys.QuickAccess  visible=True   cloaked=1 title=PowerToys Quick Access (Preview)
+WinUIDesktopWin32WindowClass pid=38020  Microsoft.CmdPal.UI    visible=True   cloaked=1 title=Command Palette
+
+--- all ---
+ApplicationManager_DesktopShellWindow pid=20620  explorer               visible=False  cloaked=2 title=
+CabinetWClass              pid=20620  explorer               visible=True   cloaked=0 title=Windows - File Explorer
+CASCADIA_HOSTING_WINDOW_CLASS pid=37596  WindowsTerminal        visible=True   cloaked=0 title=π ⠋ Clone repo, review Windows 11 compatibility
+Chrome_WidgetWin_1         pid=39556  chrome                 visible=True   cloaked=0 title=OAuth application authorized - Google Chrome
+com.freetoken.desktop-sic  pid=38324  freetoken-desktop      visible=True   cloaked=0 title=com.freetoken.desktop-siw
+Cua.AgentCursorOverlay     pid=10752  cua-driver             visible=True   cloaked=0 title=Cua.AgentCursorOverlay.default
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+DummyDWMListenerWindow     pid=20620  explorer               visible=True   cloaked=1 title=
+EdgeUiInputTopWndClass     pid=20620  explorer               visible=True   cloaked=1 title=
+EVERYTHING                 pid=4876   Everything             visible=True   cloaked=0 title=*.iso - Everything
+IME                        pid=20620  explorer               visible=False  cloaked=2 title=Default IME
+IME                        pid=33224  PowerToys.QuickAccess  visible=False  cloaked=1 title=Default IME
+IME                        pid=38020  Microsoft.CmdPal.UI    visible=False  cloaked=1 title=Default IME
+IME                        pid=5880   TextInputHost          visible=False  cloaked=2 title=Default IME
+MSCTFIME UI                pid=20620  explorer               visible=False  cloaked=2 title=MSCTFIME UI
+MSCTFIME UI                pid=33224  PowerToys.QuickAccess  visible=False  cloaked=1 title=MSCTFIME UI
+MSCTFIME UI                pid=38020  Microsoft.CmdPal.UI    visible=False  cloaked=1 title=MSCTFIME UI
+Progman                    pid=20620  explorer               visible=True   cloaked=0 title=Program Manager
+PseudoConsoleWindow        pid=16436  powershell             visible=True   cloaked=0 title=
+Qt51518QWindowIcon         pid=19732  KeePassXC              visible=True   cloaked=0 title=Database.kdbx [Locked] - KeePassXC
+RainmeterMeterWindow       pid=33020  Rainmeter              visible=True   cloaked=0 title=C:\Users\amitb\OneDrive\Documents\Rainmeter\Skins\illustro\Clock\Clock.ini
+RainmeterMeterWindow       pid=33020  Rainmeter              visible=True   cloaked=0 title=C:\Users\amitb\OneDrive\Documents\Rainmeter\Skins\illustro\Disk\2 Disks.ini
+RainmeterMeterWindow       pid=33020  Rainmeter              visible=True   cloaked=0 title=C:\Users\amitb\OneDrive\Documents\Rainmeter\Skins\illustro\Network\Network.ini
+RainmeterMeterWindow       pid=33020  Rainmeter              visible=True   cloaked=0 title=C:\Users\amitb\OneDrive\Documents\Rainmeter\Skins\illustro\System\System.ini
+Shell_TrayWnd              pid=20620  explorer               visible=True   cloaked=0 title=
+Tao Thread Event Target    pid=38324  freetoken-desktop      visible=True   cloaked=0 title=
+ThumbnailDeviceHelperWnd   pid=20620  explorer               visible=True   cloaked=1 title=
+VMUIFrame                  pid=7844   vmware                 visible=True   cloaked=0 title=Windows 11 x64 - VMware Workstation
+Windows.UI.Core.CoreWindow pid=5880   TextInputHost          visible=True   cloaked=2 title=Windows Input Experience
+WinUIDesktopWin32WindowClass pid=33224  PowerToys.QuickAccess  visible=True   cloaked=1 title=PowerToys Quick Access (Preview)
+WinUIDesktopWin32WindowClass pid=38020  Microsoft.CmdPal.UI    visible=True   cloaked=1 title=Command Palette
+
+==============================================================================
+EMBEDDED MANIFEST CHECK (supportedOS present?)
+==============================================================================
+
+==============================================================================
+EVENT LOG (last 45 minutes, errors/critical + WER for SharpE)
+==============================================================================
+Application log: No events were found that match the specified selection criteria.
+13:36:26 Windows Error Reporting :: Fault bucket , type 0 | Event Name: PerfWatsonVS12Data | Response: Not available
+13:36:25 Windows Error Reporting :: Fault bucket , type 0 | Event Name: crashpad_log | Response: Not available
+13:36:23 Windows Error Reporting :: Fault bucket , type 0 | Event Name: PerfWatsonVS12Data | Response: Not available
+
+==============================================================================
+END
+==============================================================================

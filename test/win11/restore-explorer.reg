@@ -1,0 +1,22 @@
+Windows Registry Editor Version 5.00
+
+; Undo the SharpEnviro shell registration and give the shell back to Explorer.
+; Safe to run repeatedly. Needs an elevated shell (reg import runs as the caller).
+
+; 1. per-user shell override written by SetShell.exe / the installer
+[HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Winlogon]
+"Shell"=-
+
+; 2. machine shell value (SharpE leaves this unset; Explorer is the default)
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon]
+"Shell"="explorer.exe"
+
+; 3. SharpE retargets the system.ini [boot] Shell mapping to the per-user path
+;    (USR:). Put the Windows default back (SYS:), otherwise the HKCU value keeps
+;    being consulted.
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\IniFileMapping\system.ini\boot]
+"Shell"="SYS:Microsoft\\Windows NT\\CurrentVersion\\Winlogon"
+
+; 4. XP-era separate-desktop-process tweak the installer still writes
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+"DesktopProcess"=-
