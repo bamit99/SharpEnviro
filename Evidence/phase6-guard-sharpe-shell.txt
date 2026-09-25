@@ -1,0 +1,16 @@
+﻿=== phase 6 guard: SharpE IS the shell [16:57:28] ===
+user=sharpenviro\amitb session=1
+SharpE running: SharpCore=True SharpBar=True
+
+guard under test: C:\Program Files (x86)\SharpEnviro\Addons\x64\Explorer.exe
+
+BEFORE: shellWindow=NULL  visibleCabinet=0  Shell_TrayWnd owners=[]  explorer=False
+
+running: "Explorer.exe" C:\Windows   (expect: ignored, no second shell)
+AFTER : shellWindow=NULL  visibleCabinet=0  Shell_TrayWnd owners=[]  explorer=False
+
+verdict:
+  PASS - no explorer process and no Explorer window: arguments ignored, no second shell
+
+note: SharpDebug.Info writes over WM_COPYDATA to a TSharpEDebugWnd window (SharpConsole).
+      SharpConsole is not running here, so the message is not observable - behaviour is.

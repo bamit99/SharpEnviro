@@ -264,13 +264,40 @@ SearchHost(3060)    'Search'            StartMenuExperienceHost(792) 'Start'
 A cloak-blind taskbar renders all four as phantom buttons. This is the set commit
 `7726c00` filters.
 
+## Phase 6 second half — PASS (2026-09-25 16:57)
+
+While SharpE **is** the shell, `Addons\x64\Explorer.exe C:\Windows` starts **no**
+second shell: no `explorer.exe` process, no `CabinetWClass` window, `Shell_TrayWnd`
+unchanged. Arguments are ignored as designed.
+
+So both halves of the guard work in the session it actually runs in:
+forwarding while Explorer is the shell, and refusing while SharpE is.
+
+## Phase 7 — the .NET 3.5 gate is FALSE and the host never starts (16:58)
+
+```
+NDP\v3.5\Install [64-bit] = ABSENT          NetFx3 feature = DisabledWithPayloadRemoved
+NDP\v3.5\Install [32-bit] = ABSENT
+NDP\v4\Full\Release       = 0x82405 (533509, >= 4.8)
+-> Delphi NETFramework35 gate returns FALSE (host disabled)
+
+Addons\x64\Explorer.exe   exists, 19,456 bytes (this fork's rebuild)  ... but <not running>
+SharpLinkLauncherNET / SharpShellServicesNET / SharpSearchNET          <not running>
+```
+
+This is the defect the probe change fixes, demonstrated directly: the .NET 4.8
+desktop host is present and correctly built, and **never starts**, because the
+Delphi gate reads `NDP\v3.5\Install`, which stock Windows 11 does not have.
+
+The plan's enable/disable cycle (enable NetFx3 → host starts → disable → stops) was
+not run: `NetFx3` is `DisabledWithPayloadRemoved`, so enabling it needs an install
+source. The gate's *decision* on this machine is proven regardless.
+
 ## Next steps
 
-1. Phase 6 second half: `Explorer.exe C:\Windows` while SharpE **is** the shell —
-   must NOT start a second shell.
-2. Phase 7: the .NET 3.5 gate (`NDP\v3.5\Install`), then re-enable/disable.
-3. Phase 5 remainder: UIPI (admin Notepad vs bar) and DPI at 150 %.
-4. Restore: `recover-shell.cmd`, then compare against the `-reverted` evidence.
+1. Phase 5 remainder: UIPI (admin Notepad vs bar) and DPI at 150 %.
+2. Optional: enable `NetFx3` (needs a payload source) to watch the host start.
+3. Restore: `recover-shell.cmd`, then a `-reverted` evidence pass.
 
 ## Phase 0 baseline — CONFIRMED clean (2026-09-25 16:25, after reboot)
 

@@ -1,0 +1,22 @@
+﻿=== phase 7: .NET 3.5 gate @ 2026-09-25 16:58:06 ===
+  NDP\v3.5\Install  [64-bit view] = ABSENT (key not present)
+  NDP\v3.5\Install  [32-bit view] = ABSENT (key not present)
+  NDP\v4\Full\Release             = HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full Release REG_DWORD 0x82405
+
+--- optional feature state ---
+  NetFx3 feature state = DisabledWithPayloadRemoved
+
+--- gate decision ---
+  NDP\v3.5\Install = <absent>
+  -> Delphi NETFramework35 gate returns FALSE (host disabled)
+
+--- desktop host / link launcher ---
+  Explorer                 <not running>
+  SharpLinkLauncherNET     <not running>
+  SharpShellServicesNET    <not running>
+  SharpSearchNET           <not running>
+  (the desktop host only starts when the 3.5 gate returns True)
+
+--- the built Addons\x64\Explorer.exe ---
+  exists = True  size = 19456
+  DesktopProcess = <not set>
