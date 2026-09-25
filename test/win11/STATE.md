@@ -190,12 +190,87 @@ desktop), but it is wrong, and it is the same per-session trap that produced the
 false "no shell" reading earlier. A `Progman` lookup in the *logged-on* session
 (or an explicit session check) would be correct.
 
+## Phase 4 — SharpE becomes the shell: WORKS (2026-09-25 16:51)
+
+Reboot confirmed by boot-time change (16:30:54 → **16:51:22**). Registry writes
+applied exactly as `uShellSwitcher.pas` does them:
+
+```
+amitb HKCU\...\Winlogon\Shell                = C:\Program Files (x86)\SharpEnviro\SharpCore.exe -startup
+HKLM\...\IniFileMapping\system.ini\boot\Shell = USR:Software\...\Winlogon     (64-bit view only)
+```
+
+At logon: `SharpCore` (5468), `SharpBar` ×2, `SharpDesk` all start **in session 1**;
+`explorer.exe` and the whole Win11 shell stack (`ShellExperienceHost`,
+`StartMenuExperienceHost`, `SearchHost`) do **not**. SharpE owns a `Shell_TrayWnd`.
+The takeover works.
+
+Note `SetShell.exe` was not driven directly — it is a GUI app ending in a
+"Reboot now?" MessageBox. The writes above are the same ones its `rbSharpE` radio
+performs; the optional `DesktopProcess=1` tweak was deliberately not applied.
+
+## Phase 5 — architectural checks: the documented defects are REAL
+
+Baseline (`phase5-explorer-shell.txt`) vs SharpE shell (`phase5-no-shell.txt`):
+
+| | Explorer shell | SharpE shell |
+| --- | --- | --- |
+| `GetShellWindow()` | `Progman` (explorer) | **NULL** |
+| `Shell_TrayWnd` owner | `explorer(5940)` | **`SharpCore(5468)`** |
+| `Progman` | present | **absent** |
+| `explorer.exe` | running | **not running** |
+| Win11 shell stack | running | **all dead** |
+| work area | `0,0,2138,711` (48px taskbar) | **`0,29,2138,730` (29px)** |
+
+### CONFIRMED 1: SharpE never claims the shell window
+
+`GetShellWindow()` returns **NULL** while SharpE is the shell. SharpE owns a
+`Shell_TrayWnd` but never calls `SetShellWindow`, so shell32 cannot find it —
+`FindWindow("Shell_TrayWnd")` still resolves, which is exactly why the "Show
+Desktop" and tray hand-offs land in the wrong process.
+
+### CONFIRMED 2: two shells, and Explorer wins
+
+Launching `explorer.exe` while SharpE is the shell (`phase5-architectural.txt`)
+brings up the **full genuine Windows 11 shell** — `Progman`, the real taskbar,
+Start, Search all come back — and **Explorer takes over the shell window**:
+
+```
+before: GetShellWindow() = NULL            Shell_TrayWnd owner = SharpCore(5468)
+after : GetShellWindow() = Progman(explorer 5924)   Shell_TrayWnd owner = explorer(5924)
+        work area = 0,0,2138,711   Shell_TrayWnd windows = 2   ("two shells competing")
+```
+
+The desktop, taskbar, Start and Search return, so the takeover is not exclusive.
+Killing explorer afterwards leaves `SearchHost` and `StartMenuExperienceHost`
+orphaned in session 1.
+
+### CONFIRMED 3: bar does not reserve its work area
+
+While SharpE is the shell the work area is `T29 / 701px` — a *stale* margin, not
+`SharpBar`'s height. SharpE registers no AppBar, so maximised windows cover the
+bar. When Explorer returns the work area becomes the genuine 48px taskbar.
+
+### REPRODUCED 4: cloak-blind task buttons
+
+`phase5-no-shell.txt` shows four **visible-but-cloaked** (`DWMWA_CLOAKED`=2)
+windows live on this machine:
+
+```
+CalculatorApp(8036) 'Calculator'        ApplicationFrameWindow(7852) 'Calculator'
+SearchHost(3060)    'Search'            StartMenuExperienceHost(792) 'Start'
+```
+
+A cloak-blind taskbar renders all four as phantom buttons. This is the set commit
+`7726c00` filters.
+
 ## Next steps
 
-1. **Phase 4**: set the shell as `SetShell.exe` would, then reboot - snapshot
-   `phase-0-baseline` is the rollback.
-2. Then the SharpE-as-shell half of phase 6 (guard must NOT start a second shell)
-   and phases 5 / 7.
+1. Phase 6 second half: `Explorer.exe C:\Windows` while SharpE **is** the shell —
+   must NOT start a second shell.
+2. Phase 7: the .NET 3.5 gate (`NDP\v3.5\Install`), then re-enable/disable.
+3. Phase 5 remainder: UIPI (admin Notepad vs bar) and DPI at 150 %.
+4. Restore: `recover-shell.cmd`, then compare against the `-reverted` evidence.
 
 ## Phase 0 baseline — CONFIRMED clean (2026-09-25 16:25, after reboot)
 

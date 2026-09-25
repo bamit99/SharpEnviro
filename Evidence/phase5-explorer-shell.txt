@@ -1,0 +1,38 @@
+﻿=== phase 5 @ 2026-09-25 16:48:59 ===
+user=sharpenviro\amitb  session=1  interactive=True
+
+--- shell window ---
+  GetShellWindow() = 0x100FA  class=Progman  title='Program Manager'  owner=explorer(5940)
+  => writes phase5-explorer-shell.txt
+
+--- Shell_TrayWnd family (tray ownership) ---
+  Shell_TrayWnd              present  0x100D6  owner=explorer(5940)
+  Shell_SecondaryTrayWnd     absent
+  NotifyIconOverflowWindow   absent
+  TrayNotifyWnd              absent
+  Progman                    absent
+  WorkerW                    present  0x10148  owner=explorer(5940)
+
+--- all visible top-level windows ---
+  CabinetWClass                  explorer(8840)   cloaked=0 'Windows - File Explorer'
+  CASCADIA_HOSTING_WINDOW_CLASS  WindowsTerminal(8312) cloaked=0 'Command Prompt'
+  DummyDWMListenerWindow         explorer(5940)   cloaked=1 ''
+  EdgeUiInputTopWndClass         explorer(5940)   cloaked=1 ''
+  Progman                        explorer(5940)   cloaked=0 'Program Manager'
+  PseudoConsoleWindow            cmd(9156)        cloaked=0 ''
+  Shell_TrayWnd                  explorer(5940)   cloaked=0 ''
+  VMwareDragDetWndClass          vmtoolsd(8800)   cloaked=0 ''
+
+--- work area (bar space reservation) ---
+  SPI_GETWORKAREA  = L0 T0 R2138 B711  (2138x711)
+  SM_CXSCREEN      = 2138
+  SM_CYSCREEN      = 759
+  (work area < screen => something reserved edge space for a bar)
+
+--- DPI ---
+  HKCU LogPixels   = <not set>  (96 = 100%)
+  monitor DPI      = 96 (100%)
+
+--- monitors ---
+  monitor count = 1
+  monitor 0x10001  L T R B  (0x0)

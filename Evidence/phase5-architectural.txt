@@ -1,0 +1,63 @@
+﻿=== phase 5 architectural checks @ 2026-09-25 16:55:21 ===
+user=sharpenviro\amitb session=1
+GetShellWindow() = NULL
+Shell_TrayWnd    = absent
+screen           = 2138x759
+work area (pre)  = L0 T29 R2138 B730 (2138x701)
+explorer running = False
+
+========== CHECK 1+2: start explorer.exe while SharpE is the shell ==========
+--- BEFORE ---
+    PseudoConsoleWindow            cmd(3780)            cloaked=0 ''
+    CASCADIA_HOSTING_WINDOW_CLASS  WindowsTerminal(5348) cloaked=0 'C:\WINDOWS\system32\CMD.exe'
+    TBarHideForm                   SharpBar(6848)       cloaked=0 'BarHideForm'
+    TSharpBarMainForm              SharpBar(6848)       cloaked=0 'SharpBar_96175986'
+    SharpEBarBackGround            SharpBar(6848)       cloaked=0 'SharpEBarBackGroundWindow'
+    VMwareDragDetWndClass          vmtoolsd(5344)       cloaked=0 ''
+    TBarHideForm                   SharpBar(6864)       cloaked=0 'BarHideForm'
+    TSharpBarMainForm              SharpBar(6864)       cloaked=0 'SharpBar_98253653'
+    SharpEBarBackGround            SharpBar(6864)       cloaked=0 'SharpEBarBackGroundWindow'
+    TSharpDeskMainForm             SharpDesk(6644)      cloaked=0 'SharpDesk'
+
+launching explorer.exe ...
+
+--- AFTER ---
+    Shell_TrayWnd                  explorer(5924)       cloaked=0 ''
+    Windows.UI.Core.CoreWindow     SearchHost(3060)     cloaked=2 'Search'
+    Windows.UI.Core.CoreWindow     StartMenuExperienceHost(792) cloaked=2 'Start'
+    DummyDWMListenerWindow         explorer(5924)       cloaked=1 ''
+    EdgeUiInputTopWndClass         explorer(5924)       cloaked=1 ''
+    DummyDWMListenerWindow         explorer(5924)       cloaked=1 ''
+    DummyDWMListenerWindow         explorer(5924)       cloaked=1 ''
+    DummyDWMListenerWindow         explorer(5924)       cloaked=1 ''
+    DummyDWMListenerWindow         explorer(5924)       cloaked=1 ''
+    PseudoConsoleWindow            cmd(3780)            cloaked=0 ''
+    CASCADIA_HOSTING_WINDOW_CLASS  WindowsTerminal(5348) cloaked=0 'C:\WINDOWS\system32\CMD.exe'
+    TBarHideForm                   SharpBar(6848)       cloaked=0 'BarHideForm'
+    TSharpBarMainForm              SharpBar(6848)       cloaked=0 'SharpBar_96175986'
+    SharpEBarBackGround            SharpBar(6848)       cloaked=0 'SharpEBarBackGroundWindow'
+    VMwareDragDetWndClass          vmtoolsd(5344)       cloaked=0 ''
+    TBarHideForm                   SharpBar(6864)       cloaked=0 'BarHideForm'
+    TSharpBarMainForm              SharpBar(6864)       cloaked=0 'SharpBar_98253653'
+    SharpEBarBackGround            SharpBar(6864)       cloaked=0 'SharpEBarBackGroundWindow'
+    TSharpDeskMainForm             SharpDesk(6644)      cloaked=0 'SharpDesk'
+    Progman                        explorer(5924)       cloaked=0 'Program Manager'
+
+Shell_TrayWnd owner now = absent   (was absent)
+GetShellWindow() now    = Progman (explorer(5924))
+work area now           = L0 T0 R2138 B711 (2138x711)
+explorer processes      = pid=5924 sess=1
+
+>>> number of Shell_TrayWnd windows = 2  (2+ means two shells are competing)
+
+========== CHECK 3: cloaked windows (must never become task buttons) ==========
+opening a UWP-ish window to produce cloaked entries ...
+  visible-but-cloaked windows found = 11
+  (these are exactly the windows a cloak-blind taskbar would show as phantom buttons)
+
+========== CHECK 5: work area vs bar ==========
+  screen    = 2138x759
+  work area = L0 T0 R2138 B711 (2138x711)
+  SharpBar windows:
+    SharpBar pid=6848
+    SharpBar pid=6864

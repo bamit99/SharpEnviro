@@ -1,0 +1,39 @@
+﻿=== phase 5 @ 2026-09-25 16:54:41 ===
+user=sharpenviro\amitb  session=1  interactive=True
+
+--- shell window ---
+  GetShellWindow() = NULL
+  => writes phase5-no-shell.txt
+
+--- Shell_TrayWnd family (tray ownership) ---
+  Shell_TrayWnd              present  0x20128  owner=SharpCore(5468)
+  Shell_SecondaryTrayWnd     absent
+  NotifyIconOverflowWindow   absent
+  TrayNotifyWnd              absent
+  Progman                    absent
+  WorkerW                    present  0x202CA  owner=svchost(5068)
+
+--- all visible top-level windows ---
+  CASCADIA_HOSTING_WINDOW_CLASS  WindowsTerminal(5348) cloaked=0 'C:\WINDOWS\system32\CMD.exe'
+  PseudoConsoleWindow            cmd(3780)        cloaked=0 ''
+  SharpEBarBackGround            SharpBar(6848)   cloaked=0 'SharpEBarBackGroundWindow'
+  SharpEBarBackGround            SharpBar(6864)   cloaked=0 'SharpEBarBackGroundWindow'
+  TBarHideForm                   SharpBar(6848)   cloaked=0 'BarHideForm'
+  TBarHideForm                   SharpBar(6864)   cloaked=0 'BarHideForm'
+  TSharpBarMainForm              SharpBar(6848)   cloaked=0 'SharpBar_96175986'
+  TSharpBarMainForm              SharpBar(6864)   cloaked=0 'SharpBar_98253653'
+  TSharpDeskMainForm             SharpDesk(6644)  cloaked=0 'SharpDesk'
+  VMwareDragDetWndClass          vmtoolsd(5344)   cloaked=0 ''
+
+--- work area (bar space reservation) ---
+  SPI_GETWORKAREA  = L0 T29 R2138 B730  (2138x701)
+  SM_CXSCREEN      = 2138
+  SM_CYSCREEN      = 759
+  (work area < screen => something reserved edge space for a bar)
+
+--- DPI ---
+  HKCU LogPixels   = <not set>  (96 = 100%)
+
+--- monitors ---
+  monitor count = 1
+  monitor 0x10001  L T R B  (0x0)
