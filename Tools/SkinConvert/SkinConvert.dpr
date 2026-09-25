@@ -5,6 +5,7 @@ uses
   MainForm in 'MainForm.pas' {Form31};
 
 {$R *.res}
+{$R 'SkinConvert.manifest.res'}   // Win11: supportedOS + comctl32 v6
 
 begin
   Application.Initialize;

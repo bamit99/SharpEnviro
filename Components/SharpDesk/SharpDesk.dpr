@@ -33,6 +33,7 @@ program SharpDesk;
 {$R 'metadata.res'}
 {$R 'VersionInfo.res'}
 {$R *.res}
+{$R 'SharpDesk.manifest.res'}   // Win11: supportedOS + comctl32 v6
 
 uses
   ShareMem,

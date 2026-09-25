@@ -21,7 +21,6 @@ type
     Generic1: TMenuItem;
     Install1: TMenuItem;
     Skin1: TMenuItem;
-    XPManifest1: TXPManifest;
     OpenScript: TOpenDialog;
     JvInterpreter: TJvInterpreterProgram;
     procedure FormPaint(Sender: TObject);

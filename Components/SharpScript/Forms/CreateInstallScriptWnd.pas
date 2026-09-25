@@ -31,7 +31,6 @@ type
     Panel4: TPanel;
     Label3: TLabel;
     ed_rnotes: TMemo;
-    XPManifest1: TXPManifest;
     JvInterpreter: TJvInterpreterProgram;
     lb_errors: TListBox;
     procedure ed_scriptPaintGutter(Sender: TObject; Canvas: TCanvas);

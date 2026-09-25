@@ -89,8 +89,4 @@ object InstallForm: TInstallForm
     TabOrder = 5
     OnClick = Button2Click
   end
-  object XPManifest1: TXPManifest
-    Left = 64
-    Top = 16
-  end
 end

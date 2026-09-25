@@ -28,6 +28,7 @@ program SharpConsole;
 {$R 'metadata.res'}
 {$R 'VersionInfo.res'}
 {$R *.res}
+{$R 'SharpConsole.manifest.res'}   // Win11: supportedOS + comctl32 v6
 
 uses
   ShareMem,

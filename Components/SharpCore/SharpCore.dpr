@@ -27,6 +27,7 @@ program SharpCore;
 
 
 {$R *.RES}
+{$R 'SharpCore.manifest.res'}   // Win11: supportedOS + comctl32 v6
 {$R metadata.RES}
 {$R VersionInfo.RES}
 

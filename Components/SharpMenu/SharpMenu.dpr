@@ -38,6 +38,7 @@ program SharpMenu;
 {$R 'VersionInfo.res'}
 {$R 'Res\glyphs.res'}
 {$R *.res}
+{$R 'SharpMenu.manifest.res'}   // Win11: supportedOS + comctl32 v6
 
 uses
   ShareMem,

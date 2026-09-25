@@ -69,10 +69,6 @@ object SharpScriptMainWnd: TSharpScriptMainWnd
       end
     end
   end
-  object XPManifest1: TXPManifest
-    Left = 328
-    Top = 16
-  end
   object OpenScript: TOpenDialog
     Filter = 'SharpE Script|*.sescript|SharpE Install Script|*.sip'
     Left = 296

@@ -386,10 +386,6 @@ object CreateInstallScriptForm: TCreateInstallScriptForm
     Left = 320
     Top = 192
   end
-  object XPManifest1: TXPManifest
-    Left = 272
-    Top = 240
-  end
   object JvInterpreter: TJvInterpreterProgram
     Left = 240
     Top = 104

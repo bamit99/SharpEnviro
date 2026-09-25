@@ -15,7 +15,6 @@ type
     Panel2: TPanel;
     Button1: TButton;
     Button2: TButton;
-    XPManifest1: TXPManifest;
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
   private

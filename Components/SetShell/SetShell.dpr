@@ -28,6 +28,7 @@ program SetShell;
 {$R 'VersionInfo.res'}
 {$R 'metadata.res'}
 {$R *.res}
+{$R 'SetShell.manifest.res'}   // Win11: supportedOS + comctl32 v6
 
 uses
   ShareMem,

@@ -2,11 +2,28 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net481;net6.0-windows</TargetFrameworks>
+    <TargetFramework>net481</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ApplicationManifest>Explorer.manifest</ApplicationManifest>
+    <!-- The desktop host P/Invokes the native Explorer.dll that must sit next to
+         it. The installer ships Addons\x86 and Addons\x64, and the shell picks one
+         by OS bitness at runtime, so both must be buildable:
+           dotnet build                     -> x64 (default below)
+           dotnet build -p:Platform=x86     -> x86 -->
+    <Platforms>x86;x64</Platforms>
+    <PlatformTarget Condition="'$(Platform)' == 'x86'">x86</PlatformTarget>
+    <PlatformTarget Condition="'$(Platform)' != 'x86'">x64</PlatformTarget>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>..\..\..\SharpE\Addons\$(PlatformTarget)\</OutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- net481 needs the reference assemblies; without this the build requires a
+         Visual Studio targeting pack to be installed. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Libraries\SharpEnviro\SharpEnviro.csproj" />

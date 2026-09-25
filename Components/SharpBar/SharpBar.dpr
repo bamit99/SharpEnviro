@@ -28,6 +28,7 @@ program SharpBar;
 {$R 'VersionInfo.res'}
 {$R 'metadata.res'}
 {$R *.res}
+{$R 'SharpBar.manifest.res'}   // Win11: supportedOS + comctl32 v6
 
 uses
   ShareMem,
