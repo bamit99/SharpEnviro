@@ -37,7 +37,28 @@ for %%P in (SharpCore.exe SharpBar.exe SharpDesk.exe SharpMenu.exe SharpCenter.e
 
 echo.
 echo [4/4] Starting explorer.exe
+REM `start ""` relies on the command interpreter resolving an empty title; when this
+REM script is driven from a non-interactive parent (a scheduled task, or WinRM over
+REM a hidden cmd) explorer.exe is launched but does not survive to own the shell.
+REM Launch it detached and verify, and report honestly if it did not take.
 start "" "%WinDir%\explorer.exe"
+ping -n 4 127.0.0.1 >nul
+tasklist /FI "IMAGENAME eq explorer.exe" | find /I "explorer.exe" >nul
+if errorlevel 1 (
+  echo   explorer.exe did not start - retrying detached
+  start "" /b "%WinDir%\explorer.exe"
+  ping -n 4 127.0.0.1 >nul
+  tasklist /FI "IMAGENAME eq explorer.exe" | find /I "explorer.exe" >nul
+  if errorlevel 1 (
+    echo   WARNING: explorer.exe is still not running.
+    echo   Log off and back on - the registry is already correct, so Explorer
+    echo   will be the shell at the next logon.
+  ) else (
+    echo   explorer.exe started on retry
+  )
+) else (
+  echo   explorer.exe is running
+)
 echo.
 echo Done. If the desktop did not come back, log off and on again.
 echo (Log off from Task Manager: Users tab - right-click your account - Sign off.)
